@@ -6,14 +6,16 @@ const fs = require("fs");
 
 const app = express();
 
-app.use(cors());
+// Allow all origins (Shopify compatible)
+app.use(cors({ origin: "*" }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// PDF Upload Configuration
+// File Upload Configuration
 const upload = multer({
   dest: "uploads/",
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
       cb(null, true);
@@ -26,27 +28,25 @@ const upload = multer({
 app.post("/upload", upload.single("pdf"), async (req, res) => {
   try {
 
-    // Create transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "rajvip0409@gmail.com",   // 🔴 sender gmail
-        pass: "zeff xcdu nwwz ielc" // 🔴 app password here
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
       }
     });
 
-    // Send email to YOU (client)
     await transporter.sendMail({
-      from: "rajvip0409@gmail.com",
-      to: "rajvip0409@gmail.com",   // 🔴 YOU will receive data here
+      from: process.env.GMAIL_USER,
+      to: process.env.GMAIL_USER,
       subject: "New Form Submission with PDF",
       text: `
 New Form Submission Details:
 
-Name: ${req.body.name}
-Email: ${req.body.email}
-Phone: ${req.body.phone || "Not Provided"}
-Message: ${req.body.message || "No Message"}
+Name: ${req.body.name || ""}
+Email: ${req.body.email || ""}
+Phone: ${req.body.phone || ""}
+Message: ${req.body.message || ""}
       `,
       attachments: [
         {
@@ -56,24 +56,30 @@ Message: ${req.body.message || "No Message"}
       ]
     });
 
-    // OPTIONAL: Send confirmation to customer
+    // Optional: Send confirmation to customer
     if (req.body.email) {
       await transporter.sendMail({
-        from: "rajvip0409@gmail.com",
+        from: process.env.GMAIL_USER,
         to: req.body.email,
         subject: "Thank You for Your Submission",
         text: "We have received your document successfully."
       });
     }
 
-    // Delete file after sending email (clean server)
+    // Delete file after email
     fs.unlinkSync(req.file.path);
 
     res.json({ success: true });
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// IMPORTANT for Render
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
