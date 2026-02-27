@@ -40,6 +40,10 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
+    // Respond immediately to Shopify
+    res.json({ success: true });
+
+    // Send email in background (no blocking)
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -79,11 +83,8 @@ Message: ${req.body.message || ""}
 
     fs.unlinkSync(req.file.path);
 
-    res.json({ success: true });
-
   } catch (error) {
     console.error("UPLOAD ERROR:", error);
-    res.status(500).json({ error: error.message });
   }
 });
 
@@ -91,3 +92,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
