@@ -16,7 +16,6 @@ const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
-console.log("SMTP CONFIG → PORT 587 ACTIVE");
 // Multer setup
 const upload = multer({
   dest: uploadDir,
@@ -42,7 +41,8 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
 
     // ✅ Respond immediately to Shopify
     res.json({ success: true });
-
+console.log("SMTP CONFIG → PORT 587 ACTIVE");
+    
     // ✅ Use IPv4 + Port 587 (Fix ENETUNREACH)
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -109,4 +109,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
