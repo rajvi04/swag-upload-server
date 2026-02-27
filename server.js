@@ -44,19 +44,19 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
     res.json({ success: true });
 
     // ✅ Use IPv4 + Port 587 (Fix ENETUNREACH)
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS
-      },
-      tls: {
-        rejectUnauthorized: false
-      },
-      family: 4
-    });
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
+  },
+  family: 4
+});
 
     // Send admin email
     await transporter.sendMail({
