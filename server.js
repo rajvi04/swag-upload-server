@@ -33,7 +33,7 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-app.post("/upload", upload.single("pdf"), async (req, res) => {
+  app.post("/submit", upload.single("fileUpload"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -109,5 +109,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
