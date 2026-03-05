@@ -21,10 +21,18 @@ const upload = multer({
   dest: uploadDir,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === "application/pdf") {
-      cb(null, true);
-    } else {
-      cb(new Error("Only PDF files allowed"));
+  const allowed = [
+    "application/pdf",
+    "image/jpeg",
+    "image/jpg",
+    "image/png"
+  ];
+
+      if (allowed.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Invalid file type"));
+      }
     }
   }
 });
@@ -109,6 +117,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 
